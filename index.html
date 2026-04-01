@@ -3,128 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aether</title>
+    <title>Aether </title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔥</text></svg>">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --p: #1a73e8; --bg: #f8f9fa; --s: #ffffff; --t: #202124; --b: #dadce0; --danger: #d93025; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; transition: all 0.15s ease; }
+        :root { --p: #1a73e8; --bg: #f8f9fa; --s: #ffffff; --t: #202124; --b: #dadce0; --danger: #d93025; --success: #1e8e3e; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; transition: 0.1s; }
         body, html { margin: 0; padding: 0; height: 100vh; background: var(--bg); color: var(--t); overflow: hidden; }
-        #auth-gate { position: fixed; inset: 0; background: #202124; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .login-card { background: #fff; padding: 40px; border-radius: 8px; width: 380px; box-shadow: 0 24px 38px rgba(0,0,0,0.3); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--b); border-radius: 4px; outline: none; font-size: 14px; }
-        .btn-p { width: 100%; padding: 12px; background: var(--p); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        #auth-gate { position: fixed; inset: 0; background: radial-gradient(circle, #2c3e50, #000); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .login-card { background: #fff; padding: 40px; border-radius: 12px; width: 400px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); text-align: center; }
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid var(--b); border-radius: 8px; outline: none; font-size: 15px; }
+        .btn-p { width: 100%; padding: 14px; background: var(--p); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; }
+        .btn-p:hover { background: #1557b0; }
         #dashboard { display: none; height: 100vh; flex-direction: column; }
-        .nav { background: #fff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--b); }
-        .doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; padding: 40px; overflow-y: auto; }
-        .doc-item { background: #fff; padding: 20px; border-radius: 6px; border: 1px solid var(--b); cursor: pointer; position: relative; }
-        .doc-item:hover { border-color: var(--p); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .badge { font-size: 10px; padding: 2px 6px; border-radius: 10px; background: #eee; margin-left: 8px; vertical-align: middle; }
-        #editor-view { display: none; height: 100vh; flex-direction: column; }
-        .ed-header { background: #fff; padding: 8px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--b); }
-        .teleport { width: 36px; height: 36px; background: #1a73e8; color: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .teleport:hover { background: #d93025; transform: rotate(-90deg); }
+        .nav { background: #fff; padding: 12px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--b); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .copy-id-btn { background: #f1f3f4; border: 1px solid var(--b); padding: 8px 15px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 13px; }
+        .copy-id-btn:hover { background: #e8eaed; border-color: var(--p); color: var(--p); }
+        .doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; padding: 40px; overflow-y: auto; flex: 1; }
+        .doc-item { background: #fff; padding: 25px; border-radius: 10px; border: 1px solid var(--b); cursor: pointer; position: relative; transition: 0.3s; }
+        .doc-item:hover { transform: translateY(-8px); border-color: var(--p); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+        #editor-view { display: none; height: 100vh; flex-direction: column; background: var(--bg); }
+        .ed-header { background: #fff; padding: 10px 25px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--b); }
+        .teleport { width: 42px; height: 42px; background: #000; color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; }
+        .teleport:hover { background: var(--danger); transform: scale(1.1); }
         .main-layout { display: flex; flex: 1; overflow: hidden; }
-        .scroll-container { flex: 1; overflow-y: auto; padding: 40px; display: flex; justify-content: center; background: #f1f3f4; }
-        #canvas { width: 816px; min-height: 1056px; background: #fff; padding: 96px; outline: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .sidebar { width: 320px; background: #fff; border-left: 1px solid var(--b); display: flex; flex-direction: column; }
+        .scroll-container { flex: 1; overflow-y: auto; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; }
+        #canvas { width: 816px; min-height: 1056px; background: #fff; padding: 96px; outline: none; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #eee; margin-bottom: 50px; }
+        .sidebar { width: 350px; background: #fff; border-left: 1px solid var(--b); display: flex; flex-direction: column; transform: translateX(0); }
         .sidebar.hidden { display: none; }
-        .chat-area { flex: 1; padding: 15px; overflow-y: auto; border-bottom: 1px solid var(--b); }
-        .msg { margin-bottom: 12px; font-size: 13px; }
-        .msg b { color: var(--p); }
-        .toolbar { background: #fff; padding: 6px 20px; display: flex; gap: 8px; border-bottom: 1px solid var(--b); align-items: center; }
-        .t-btn { padding: 6px 10px; border: none; background: none; cursor: pointer; border-radius: 4px; color: #5f6368; }
+        .chat-area { flex: 1; padding: 20px; overflow-y: auto; background: #fafafa; }
+        .msg { margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; font-size: 13.5px; }
+        .toolbar { background: #fff; padding: 8px 30px; display: flex; gap: 10px; border-bottom: 1px solid var(--b); align-items: center; position: sticky; top: 0; z-index: 10; }
+        .t-btn { padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: #5f6368; font-size: 15px; }
         .t-btn:hover { background: #f1f3f4; color: var(--p); }
-        .perm-indicator { margin-left: auto; font-size: 12px; font-weight: 600; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; }
-        .owner-view { background: #e6f4ea; color: #137333; }
-        .editor-view-tag { background: #e8f0fe; color: #1967d2; }
-        .viewer-view { background: #fce8e6; color: #c5221f; }
+        .perm-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; border: 1px solid transparent; }
+        .owner-tag { color: var(--success); border-color: var(--success); background: #e6f4ea; }
+        .editor-tag { color: var(--p); border-color: var(--p); background: #e8f0fe; }
+        .viewer-tag { color: var(--danger); border-color: var(--danger); background: #fce8e6; }
+        #save-status { font-size: 11px; color: #70757a; display: flex; align-items: center; gap: 5px; margin-left: 15px; }
     </style>
 </head>
 <body>
 
 <div id="auth-gate">
     <div class="login-card">
-        <h2 style="margin:0 0 20px 0; letter-spacing: 1px;">AETHER</h2>
-        <input type="text" id="uIn" placeholder="Username">
-        <input type="password" id="pIn" placeholder="Password">
+        <h1 style="margin:0 0 10px 0; color:var(--p)">AETHER</h1>
+        <p style="color:#666; margin-bottom:30px;">Professional Network Access</p>
+        <input type="text" id="uIn" placeholder="Enter Username">
+        <input type="password" id="pIn" placeholder="Access Password">
         <select id="roleIn">
-            <option value="owner">Role: Owner</option>
-            <option value="editor">Role: Editor</option>
-            <option value="viewer-chatter">Role: Viewer & Chatter</option>
-            <option value="viewer">Role: Viewer Only</option>
+            <option value="owner">Role: System Owner</option>
+            <option value="editor">Role: Senior Editor</option>
+            <option value="viewer-chatter">Role: Collaborative Viewer</option>
+            <option value="viewer">Role: Auditor (View Only)</option>
         </select>
-        <button class="btn-p" onclick="auth()">Sign In</button>
+        <button class="btn-p" onclick="auth()">Initialize Session</button>
     </div>
 </div>
 
 <div id="dashboard">
     <nav class="nav">
-        <div style="display:flex; align-items:center; gap:12px;">
-            <i class="fas fa-shield-halved" style="color:var(--p)"></i>
-            <span style="font-weight:600; font-size:18px;" id="userTitle">Aether Cloud</span>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <i class="fas fa-microchip" style="color:var(--p); font-size:24px;"></i>
+            <h2 style="margin:0; font-weight:500; font-size:20px;" id="userTitle"></h2>
         </div>
-        <button class="btn-p" style="width:auto; padding:8px 24px;" onclick="newDoc()">+ Create Document</button>
+        <div style="display:flex; gap:15px; align-items:center;">
+            <button class="copy-id-btn" onclick="copyMyID()">
+                <i class="fas fa-clipboard"></i>
+                <span id="idLabel">Copy Node ID</span>
+            </button>
+            <button class="btn-p" style="width:auto; padding:10px 25px;" onclick="newDoc()">+ New Archive</button>
+        </div>
     </nav>
     <div class="doc-grid" id="grid"></div>
 </div>
 
 <div id="editor-view">
     <header class="ed-header">
-        <div class="teleport" onclick="exit()" title="Teleport to Drive"><i class="fas fa-rocket"></i></div>
-        <input type="text" id="docTitle" style="border:none; font-size:18px; width:300px;" value="Technical Manuscript">
-        <div id="userBadge" class="perm-indicator">PERMISSION</div>
-        <button class="t-btn" onclick="invite()"><i class="fas fa-user-plus"></i> Invite</button>
-        <button class="t-btn" onclick="toggleSide()"><i class="fas fa-bars"></i></button>
+        <div class="teleport" onclick="exit()" title="Teleport to Drive"><i class="fas fa-door-open"></i></div>
+        <div style="display:flex; flex-direction:column;">
+            <input type="text" id="docTitle" style="border:none; font-size:18px; font-weight:600; outline:none;" value="Global Strategy Draft">
+            <div id="save-status"><i class="fas fa-cloud-upload-alt"></i> Synced with Network</div>
+        </div>
+        <div id="userBadge" class="perm-tag"></div>
+        <div style="margin-left:auto; display:flex; gap:10px;">
+            <button class="btn-p" style="width:auto; padding:8px 15px; background:#202124;" onclick="invite()"><i class="fas fa-link"></i> Link Peer</button>
+            <button class="t-btn" onclick="toggleSide()"><i class="fas fa-comment-dots" style="font-size:20px;"></i></button>
+        </div>
     </header>
     <div class="toolbar" id="tb">
-        <button class="t-btn" onclick="exec('bold')"><i class="fas fa-bold"></i></button>
-        <button class="t-btn" onclick="exec('italic')"><i class="fas fa-italic"></i></button>
+        <button class="t-btn" onclick="exec('bold')" title="Bold"><i class="fas fa-bold"></i></button>
+        <button class="t-btn" onclick="exec('italic')" title="Italic"><i class="fas fa-italic"></i></button>
         <button class="t-btn" onclick="exec('underline')"><i class="fas fa-underline"></i></button>
-        <button class="t-btn" onclick="exec('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
-        <button class="t-btn" onclick="table()"><i class="fas fa-table"></i></button>
-        <button class="t-btn" onclick="pdf()"><i class="fas fa-file-pdf"></i></button>
-        <button class="t-btn" onclick="transfer()" id="ownerBtn" style="display:none; color:var(--danger)"><i class="fas fa-crown"></i> Transfer Ownership</button>
+        <div style="width:1px; height:20px; background:#ddd;"></div>
+        <button class="t-btn" onclick="exec('justifyLeft')"><i class="fas fa-align-left"></i></button>
+        <button class="t-btn" onclick="exec('justifyCenter')"><i class="fas fa-align-center"></i></button>
+        <div style="width:1px; height:20px; background:#ddd;"></div>
+        <button class="t-btn" onclick="table()"><i class="fas fa-table"></i> Insert Matrix</button>
+        <button class="t-btn" onclick="pdf()"><i class="fas fa-file-export"></i> Render PDF</button>
+        <button class="t-btn" onclick="takeSnapshot()"><i class="fas fa-camera"></i> Snapshot</button>
+        <button class="t-btn" id="ownerBtn" style="display:none; color:var(--danger); margin-left:auto;" onclick="transfer()"><i class="fas fa-crown"></i> Transfer Authority</button>
     </div>
     <div class="main-layout">
         <div class="scroll-container">
-            <div id="canvas" contenteditable="true" spellcheck="false"></div>
+            <div id="canvas" contenteditable="true" spellcheck="false">
+                <h1 style="text-align:center;">Aether Enterprise Document</h1>
+                <p>Begin secure data entry...</p>
+            </div>
         </div>
         <aside class="sidebar" id="side">
-            <div style="padding:15px; border-bottom:1px solid var(--b); font-weight:600; font-size:14px;">Secure Channel</div>
+            <div style="padding:20px; border-bottom:1px solid var(--b); background:#f8f9fa; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:700; font-size:14px; letter-spacing:1px;">ENCRYPTED CHAT</span>
+                <i class="fas fa-shield-alt" style="color:var(--success)"></i>
+            </div>
             <div class="chat-area" id="chat"></div>
-            <div style="padding:15px;" id="chatInputArea">
-                <input type="text" id="msgIn" placeholder="Secure message..." onkeypress="if(event.key==='Enter') send()">
+            <div style="padding:20px; background:#fff; border-top:1px solid var(--b);">
+                <input type="text" id="msgIn" placeholder="Type message..." onkeypress="if(event.key==='Enter') send()">
             </div>
         </aside>
     </div>
 </div>
 
 <script>
-    let user = { name: "", role: "" };
-    let docs = [{id:101, title: "Company Handbook", owner: "Admin"}];
+    let user = { name: "", role: "", id: "" };
+    let docs = [{id:1, title: "Operational Guidelines", owner: "System"}];
+    let snapshots = [];
     const peer = new Peer();
     let connections = [];
+
+    peer.on('open', id => { user.id = id; });
+    peer.on('connection', c => setup(c));
 
     function auth() {
         user.name = document.getElementById('uIn').value;
         user.role = document.getElementById('roleIn').value;
-        if(!user.name) return;
+        if(!user.name || !document.getElementById('pIn').value) return alert("Credentials required.");
         document.getElementById('auth-gate').style.display = 'none';
         document.getElementById('dashboard').style.display = 'flex';
-        document.getElementById('userTitle').innerText = `Aether Drive | ${user.name}`;
-        render();
+        document.getElementById('userTitle').innerText = `${user.name} @ Aether`;
+        renderDocs();
     }
 
-    function render() {
+    function renderDocs() {
         const g = document.getElementById('grid');
         g.innerHTML = docs.map(d => `
             <div class="doc-item" onclick="openDoc('${d.title}')">
-                <i class="fas fa-file-invoice" style="font-size:32px; color:var(--p); margin-bottom:10px;"></i>
-                <div style="font-weight:600;">${d.title}</div>
-                <div style="font-size:11px; color:#666;">Owner: ${d.owner}</div>
+                <i class="fas fa-file-lines" style="font-size:40px; color:var(--p); margin-bottom:20px;"></i>
+                <div style="font-weight:700; font-size:16px;">${d.title}</div>
+                <div style="font-size:12px; color:#888; margin-top:8px;">Node Access: ${d.owner}</div>
+                <div class="perm-tag editor-tag" style="position:absolute; bottom:20px; right:20px; font-size:9px;">SECURE</div>
             </div>
         `).join('');
     }
@@ -140,23 +169,18 @@
         const badge = document.getElementById('userBadge');
         const canvas = document.getElementById('canvas');
         const tb = document.getElementById('tb');
-        const chatBox = document.getElementById('chatInputArea');
+        const side = document.getElementById('side');
         const ob = document.getElementById('ownerBtn');
 
-        badge.innerText = user.role.replace('-', ' & ');
-        badge.className = "perm-indicator " + (user.role === 'owner' ? 'owner-view' : user.role === 'editor' ? 'editor-view-tag' : 'viewer-view');
+        badge.innerText = user.role;
+        badge.className = "perm-tag " + (user.role === 'owner' ? 'owner-tag' : user.role === 'editor' ? 'editor-tag' : 'viewer-tag');
 
         if(user.role === 'viewer' || user.role === 'viewer-chatter') {
             canvas.contentEditable = "false";
             tb.style.pointerEvents = "none";
             tb.style.opacity = "0.5";
         }
-        if(user.role === 'viewer') {
-            chatBox.style.display = "none";
-        }
-        if(user.role === 'owner') {
-            ob.style.display = "block";
-        }
+        if(user.role === 'owner') ob.style.display = "flex";
     }
 
     function exit() {
@@ -164,16 +188,16 @@
         document.getElementById('dashboard').style.display = 'flex';
     }
 
-    function newDoc() {
-        const n = prompt("Document Title:");
-        if(n) { docs.push({id:Date.now(), title:n, owner:user.name}); render(); openDoc(n); }
+    function copyMyID() {
+        navigator.clipboard.writeText(user.id);
+        const label = document.getElementById('idLabel');
+        label.innerText = "COPIED!";
+        label.style.color = "var(--success)";
+        setTimeout(() => { label.innerText = "Copy Node ID"; label.style.color = ""; }, 2000);
     }
 
-    peer.on('open', id => console.log("Peer ID:", id));
-    peer.on('connection', c => setup(c));
-
     function invite() {
-        const id = prompt("Enter Colleague ID:");
+        const id = prompt("Enter Peer Node ID:");
         if(id) setup(peer.connect(id));
     }
 
@@ -184,13 +208,16 @@
             c.on('data', d => {
                 if(d.type === 'sync') document.getElementById('canvas').innerHTML = d.data;
                 if(d.type === 'msg') log(d.user, d.txt);
-                if(d.type === 'meta') log('System', `${d.user} (${d.role}) connected.`);
+                if(d.type === 'meta') log('SYSTEM', `${d.user} [${d.role}] established connection.`);
             });
         });
     }
 
     document.getElementById('canvas').addEventListener('input', (e) => {
+        const stat = document.getElementById('save-status');
+        stat.innerHTML = `<i class="fas fa-sync fa-spin"></i> Broadcasting...`;
         connections.forEach(c => c.send({type:'sync', data: e.target.innerHTML}));
+        setTimeout(() => { stat.innerHTML = `<i class="fas fa-cloud-check" style="color:var(--success)"></i> Network Synced`; }, 500);
     });
 
     function exec(c) { document.execCommand(c, false, null); }
@@ -198,7 +225,7 @@
     
     function send() {
         const i = document.getElementById('msgIn');
-        if(!i.value) return;
+        if(!i || !i.value) return;
         log('You', i.value);
         connections.forEach(c => c.send({type:'msg', user: user.name, txt: i.value}));
         i.value = '';
@@ -206,15 +233,17 @@
 
     function log(u, m) {
         const c = document.getElementById('chat');
-        c.innerHTML += `<div class="msg"><b>${u}:</b> ${m}</div>`;
+        c.innerHTML += `<div class="msg"><b>${u}</b><div style="margin-top:5px;">${m}</div></div>`;
         c.scrollTop = c.scrollHeight;
     }
 
-    function table() { exec('insertHTML', `<table style="width:100%; border:1px solid #ddd; border-collapse:collapse;"><tr><td style="border:1px solid #ddd; padding:8px;">Data</td><td style="border:1px solid #ddd; padding:8px;">Data</td></tr></table><br>`); }
-    function pdf() { html2pdf().from(document.getElementById('canvas')).save('Aether_Export.pdf'); }
+    function table() { exec('insertHTML', `<table style="width:100%; border:1px solid #ddd; border-collapse:collapse; margin:20px 0;"><tr><td style="border:1px solid #ddd; padding:12px;">Matrix Data</td><td style="border:1px solid #ddd; padding:12px;">Matrix Data</td></tr></table>`); }
+    function pdf() { html2pdf().from(document.getElementById('canvas')).save('Aether_Internal_Archive.pdf'); }
+    function newDoc() { const n = prompt("Archive Name:"); if(n) { docs.push({id:Date.now(), title:n, owner:user.name}); renderDocs(); openDoc(n); } }
+    function takeSnapshot() { snapshots.push(document.getElementById('canvas').innerHTML); alert("State Snapshot Recorded locally for this session."); }
     function transfer() {
-        const target = prompt("Enter Username to transfer ownership to:");
-        if(target) { alert(`Ownership successfully transferred to ${target}. Your role is now Editor.`); user.role = 'editor'; applyPerms(); }
+        const target = prompt("Transfer full system authority to (Username):");
+        if(target) { alert(`Authority delegated to ${target}. Standardizing user role.`); user.role = 'editor'; applyPerms(); }
     }
 </script>
 </body>
